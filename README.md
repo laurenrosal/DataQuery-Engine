@@ -68,6 +68,56 @@ The system is composed of several key components:
     - `skip`
 - Inserts rows manually (no `df.to_sql()`)
 
+## Database Schema
+The database is structured using a normalized schema centered around cybersecuirty incidents. 
+
+Each incident reference multiple lookup tables to reduce redundancy and improve query efficiency.
+
+![SecureQuery database tables](database_tablesSetup.png)
+
+## Main Table: `incidents`
+- `id` (PK)
+- `year`
+- `country`
+- `target_industry`
+- `financial_loss_usd_m`
+- `num_affected_users`
+- `resolution_hours`
+- `attack_type_id` (FK)
+- `source_id` (FK)
+- `vulerability_id` (FK)
+- `defense_id` (FK)
+
+### Lookup Tables
+
+#### `attack_types`
+- `attack_type_id` (PK)
+- `name`
+
+#### `attack_sources`
+- `source_id` (PK)
+- `name`
+
+#### `vulnerability_types`
+- `vulnerability_id` (PK)
+- `name`
+
+#### `defense_mechanisms`
+- `defense_id` (PK)
+- `name`
+
+---
+
+### Relationships
+
+- Each **incident** is linked to:
+  - one attack type
+  - one attack source
+  - one vulnerability type
+  - one defense mechanism
+
+This design reduce duplication and allows more efficient querying and filtering across categories 
+
 ---
 
 ## Dataset 
