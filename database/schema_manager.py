@@ -21,7 +21,7 @@ class SchemaManager:
         """Return all table names in the database."""
         with self._conn() as conn:
             rows = conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table"
+                "SELECT name FROM sqlite_master WHERE type='table'"
             ).fetchall()
         return [r["name"] for r in rows]
     
@@ -43,9 +43,9 @@ class SchemaManager:
         return table in self.get_tables()
     
     def schemas_match(self, table: str, df: pas.DataFrame) -> bool:
-        """Check if a DataFrame's columns match an existing table's schema."""
         existing = {col["name"].lower(): col["type"]
-                    for col in self.get_table_schema(table)}
+                    for col in self.get_table_schema(table)
+                    if col["name"] != "id"}
         incoming = {col.lower(): self.infere_sql_type(dtype)
                     for col, dtype in df.dtypes.items()}
         return existing == incoming
