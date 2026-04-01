@@ -1,4 +1,4 @@
-# SecureQuery
+# DataQuery Engine
 SecureQuery is a modular system that allows users to query cybersecuity data using natural language. 
 
 The goal of the project is to translate user input into SQL using an LLM, validate the query for safety, and execute it on SQLite database.
