@@ -65,6 +65,8 @@ Rules:
 - Always wrap column names in double quotes e.g. "column_name"
 - EVERY query MUST include FROM table_name — never omit it
 - For aggregations always include GROUP BY and ORDER BY
+- String values in WHERE clauses are case-sensitive — preserve exact casing
+- Use LIKE for case-insensitive matching when the user's intent is broad
 - Return ONLY the raw SQL query — no explanation, no markdown, no code blocks
 
 Correct example:
