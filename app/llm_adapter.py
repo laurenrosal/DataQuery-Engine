@@ -3,27 +3,23 @@ import re
 from config import ANTHROPIC_API_KEY, MAX_TOKENS
 
 class LLMError(Exception):
-    #Raised when the LLm adapter fails to generate a valid SQL query
+    #rasied if something goes wrong when calling the LLM
     pass
 
-#translates natural language questions into SQL queries
 class LLMAdapter:
-
-    #The model to use - claude-sonnet
+    #using Claude Sonnet for now
     MODEL = "claude-sonnet-4-20250514"
 
     def __init__(self):
-        #initialize the anthropic client with the API key from config
+        #set up the client using the API key from config
         self.client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
     
-    #translate a natural language question into SQL query
     def generate_sql(self, user_question:str, schema: dict) -> str:
-
-        #build the promt with the current schema baked in 
+        #build the prompt using the current schema
         prompt = self._build_prompt(user_question, schema)
 
         try:
-            #call the claude API
+            #send request to Claude
             message = self.client.messages.create(
                 model=self.MODEL,
                 max_tokens=MAX_TOKENS,
@@ -32,13 +28,13 @@ class LLMAdapter:
                 ]
             )
 
-            #extract the text from the reponse 
+            #grab the text response
             response_text = message.content[0].text
         
         except anthropic.APIError as e:
             raise LLMError(f"Claude API call failded: {e}")
         
-        #pull just the SQL out of the reponse 
+        #try to extract just the SQL from the response
         sql = self._extract_sql(response_text)
 
         if not sql:
@@ -48,10 +44,8 @@ class LLMAdapter:
             )
         return sql
     
-    #build the prompt sent to claude
     def _build_prompt(self, user_question: str, schema: dict) -> str:
-
-        #format the schema into readable table description 
+        #turn schema into readable text
         schema_description = self._format_schema(schema)
 
         prompt = f"""You are a SQL expert. Convert the user's question into a complete, valid SQLite SELECT query.
@@ -82,21 +76,25 @@ Complete SQL query (must include FROM):"""
 
         return prompt
     
-    # convert the schema dict into a readable string for the prompt.
     def _format_schema(self, schema: dict) -> str:
         lines = []
+
         for table_name, columns in schema.items():
             # Skip SQLite internal tables
             if table_name == "sqlite_sequence":
                 continue
+
             lines.append(f"Table: {table_name}")
+
             for col in columns:
                 lines.append(f"  - {col['name']} ({col['type']})")
-            lines.append("")  # blank line between tables
+
+            lines.append("")  # space between tables
+
         return "\n".join(lines)
     
-    # extract a SQL query from claude repose text
     def _extract_sql(self, response_text: str) -> str:
+        # case 1: sql inside ``` blocks
         code_block = re.search(
         r'```(?:sql)?\s*(.*?)\s*```',
         response_text,
@@ -105,16 +103,17 @@ Complete SQL query (must include FROM):"""
         if code_block:
             return code_block.group(1).strip().rstrip(";").strip()
         
-        # Case 2 — find SELECT and grab everything from there to the end
+        # Case 2 — find first SELECT and take everything after it
         lines = response_text.strip().splitlines()
+
         for i, line in enumerate(lines):
             if line.strip().upper().startswith("SELECT"):
-                # Join from this line to the end — captures multi-line SQL
                 sql = "\n".join(lines[i:]).strip().rstrip(";").strip()
-            return sql
+                return sql
 
-        # Case 3 — whole response starts with SELECT
+        # Case 3 — whole response is already just SQL
         cleaned = response_text.strip().rstrip(";").strip()
+        
         if cleaned.upper().startswith("SELECT"):
             return cleaned
 
