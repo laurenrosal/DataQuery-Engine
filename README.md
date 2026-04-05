@@ -5,7 +5,6 @@ The system translates user question into SQL using Claude (Anthropic), validates
 
 ## System Review Video
 
-[![SecureQuery Walkthrough](https://img.youtube.com/vi/OlKOwLCfBr8/0.jpg)](https://youtu.be/OlKOwLCfBr8)
 
 [Watch the 7-minute architecture walkthrough here](https://youtu.be/OlKOwLCfBr8)
 
