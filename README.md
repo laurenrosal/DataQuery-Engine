@@ -3,6 +3,11 @@ A modular natural language interface for querying structured data using SQL and 
 
 The system translates user question into SQL using Claude (Anthropic), validates every query for safety, and execute it against a SQLite database. It works with any CSV file.
 
+## System Review Video
+
+[![SecureQuery Walkthrough](https://img.youtube.com/vi/OlKOwLCfBr8/0.jpg)](https://youtu.be/OlKOwLCfBr8)
+
+[Watch the 7-minute architecture walkthrough here](https://youtu.be/OlKOwLCfBr8)
 
 ## Features
 
